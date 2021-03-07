@@ -27,8 +27,10 @@ void AGoKart::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//Velmax= |1| * MaxDrivingForce * |1|= MaxDrivingForce
-	FVector Force = GetActorForwardVector() * MaxDrivingForce * Acelerador;//Throttle;
-	
+	FVector Force = GetActorForwardVector()*MaxDrivingForce*Acelerador; //Throttle;
+	Force += GetAirResistance();
+	Force += GetFrictionResistance(); 
+
 	FVector Acceleration = Force / Mass;
 
 
@@ -40,14 +42,33 @@ void AGoKart::Tick(float DeltaTime)
 	Move(DeltaTime);
 	//AddActorWorldOffset(Translation, true);
 }
+
+FVector AGoKart::GetAirResistance()
+{
+	return - Velocity.GetSafeNormal() * Velocity.SizeSquared() * DragCoefificient;
+}
+
+
+FVector AGoKart::GetFrictionResistance()
+{
+	float Peso = Mass * GetWorld()->GetGravityZ() / 100; // (N) requiere Gravity en mts Pasarlo a
+	UE_LOG(LogTemp, Warning, TEXT("Gravity: %f "), GetWorld()->GetGravityZ()); // Unreal en cm
+	UE_LOG(LogTemp, Warning, TEXT("Gravity en mts: %f "), (GetWorld()->GetGravityZ()/100)); // Unreal en cm
+	float Normal = -Peso;
+
+	return -Velocity.GetSafeNormal()*Normal*nuCoefificient;
+}
+
 void AGoKart::Rotate(float DeltaTime)
 {
-	float RotatationAngle = MaxDegreePerSecond * DeltaTime* Volante;//SteeringThrow;
-
-	UE_LOG(LogTemp, Warning, TEXT("Giro en Tick: %f "), Volante);
-	UE_LOG(LogTemp, Warning, TEXT("RotatationAngle: %f "), RotatationAngle);
+	float DeltaLocation = FVector::DotProduct(GetActorForwardVector(), Velocity) * DeltaTime;
 	
-	FQuat RotationDelta(GetActorUpVector(),FMath::DegreesToRadians( RotatationAngle ));
+	float RotatationAngle = DeltaLocation  / MinimunTurningRadius  * Volante; //SteeringThrow;
+
+	/*UE_LOG(LogTemp, Warning, TEXT("Giro en Tick: %f "), Volante);
+	UE_LOG(LogTemp, Warning, TEXT("RotatationAngle: %f "), RotatationAngle);*/
+	
+	FQuat RotationDelta(GetActorUpVector(),RotatationAngle);
 
 	//Update Velocity
 	Velocity = RotationDelta.RotateVector(Velocity);

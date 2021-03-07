@@ -34,9 +34,15 @@ public:
 
 private:
 
+	FVector GetAirResistance();
+
+	FVector GetFrictionResistance();
+
 	void Rotate(float DeltaTime);
 
 	void Move(float DeltaTime);
+
+	
 
 	/**The mass of the car in (kg)*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
@@ -51,14 +57,25 @@ private:
 	/**Acelerador Translation*/
 	float Volante, Acelerador;
 
+
+
 	//The force applied to th car when the Throttle is fully down in (N)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
 		float MaxDrivingForce = 10000.0f;
+
+		/*Minimun Radius of the car turning at the fukk lock (minutes)*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
+		float MinimunTurningRadius = 10.0f;
 
 	//The number of degrees rotated per second at full controll thtow fully in (degrees/s)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
 		float MaxDegreePerSecond = 90.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
+		float DragCoefificient = 25.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SettingKart", meta = (AllowPrivateAccess = "true"))
+		float nuCoefificient = .015f;
 	
 	void MoveForward(float Value); //Deprec
 
